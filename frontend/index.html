@@ -10,21 +10,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#ffffff;
-  --surface:#f7f8fc;
-  --surface2:#eef1f7;
-  --border:#e3e6ef;
-
-  --accent:#ff3366;
-  --accent2:#7c3aed;
-  --gold:#f59e0b;
-  --green:#10b981;
-
-  --text:#1a1d2b;
-  --muted:#6b7394;
-
-  --font-head:'Inter',sans-serif;
-  --font-mono:'JetBrains Mono',monospace;
+  --bg:#08090d;--surface:#10121a;--surface2:#181c28;--border:#232840;
+  --accent:#ff3366;--accent2:#7c3aed;--gold:#f59e0b;--green:#10b981;
+  --text:#e8ecf5;--muted:#6b7394;
+  --font-head:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -246,11 +235,133 @@ tr.reminded td{background:rgba(16,185,129,.025)}
 /* Animations */
 .fade-up{animation:fadeUp .45s ease both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── LOGIN OVERLAY ── */
+#login-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .6s ease,visibility .6s ease;
+}
+#login-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+
+.login-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:2.6rem 2.2rem 2.2rem;width:100%;max-width:400px;
+  position:relative;overflow:hidden;
+  box-shadow:0 0 60px rgba(255,51,102,.08),0 20px 60px rgba(0,0,0,.5);
+}
+.login-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+}
+.login-glow{
+  position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+  width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,51,102,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.login-logo{display:flex;align-items:center;gap:.8rem;margin-bottom:2rem;justify-content:center}
+.login-logo .logo-mark{width:44px;height:44px;border-radius:12px;font-size:.9rem}
+.login-logo .logo-text{font-size:1.4rem}
+.login-heading{font-size:1rem;font-weight:600;margin-bottom:.3rem;text-align:center}
+.login-sub{font-size:.72rem;color:var(--muted);font-family:var(--font-mono);text-align:center;margin-bottom:1.8rem;letter-spacing:.03em}
+
+.login-field{margin-bottom:1rem}
+.login-field label{display:block;font-size:.7rem;font-family:var(--font-mono);color:var(--muted);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:.45rem}
+.login-field input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  padding:.68rem 1rem;border-radius:10px;font-family:var(--font-mono);font-size:.88rem;
+  outline:none;transition:border .2s,box-shadow .2s;
+}
+.login-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,51,102,.1)}
+.login-field input::placeholder{color:var(--muted)}
+
+.login-error{
+  background:rgba(255,51,102,.08);border:1px solid rgba(255,51,102,.25);
+  color:#ff7a9a;border-radius:8px;padding:.6rem 1rem;
+  font-size:.72rem;font-family:var(--font-mono);margin-bottom:1rem;
+  display:none;
+}
+.login-error.show{display:block}
+
+.login-btn{
+  width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;padding:.75rem;border-radius:10px;
+  font-family:var(--font-head);font-weight:600;font-size:.95rem;cursor:pointer;
+  letter-spacing:.01em;box-shadow:0 4px 20px rgba(255,51,102,.3);
+  transition:transform .2s,box-shadow .2s,opacity .2s;margin-top:.2rem;
+}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(255,51,102,.45)}
+.login-btn:active{transform:translateY(0)}
+
+.login-hint{
+  margin-top:1.4rem;padding:1rem;
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  font-family:var(--font-mono);font-size:.68rem;color:var(--muted);line-height:1.9;
+}
+.login-hint .hint-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent2);margin-bottom:.35rem}
+.login-hint span{color:var(--text)}
+
+.login-divider{
+  display:flex;align-items:center;gap:.8rem;margin:1.3rem 0;
+}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.login-divider span{font-size:.62rem;color:var(--muted);font-family:var(--font-mono);white-space:nowrap;letter-spacing:.06em}
+
+.btn-guest{
+  width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:.65rem;border-radius:10px;font-family:var(--font-mono);font-size:.78rem;cursor:pointer;
+  transition:all .2s;letter-spacing:.03em;
+}
+.btn-guest:hover{border-color:var(--muted);color:var(--text)}
+
+@keyframes loginFadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.login-card{animation:loginFadeIn .5s ease both}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- ── LOGIN OVERLAY ── -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-glow"></div>
+
+    <div class="login-logo">
+      <div class="logo-mark">SVS</div>
+      <div>
+        <div class="logo-text">Sub<span style="color:var(--accent)">Vampire</span> Slayer</div>
+      </div>
+    </div>
+
+    <div class="login-heading">Welcome back</div>
+    <div class="login-sub">Sign in to your subscription intelligence dashboard</div>
+
+    <div class="login-error" id="login-error">Incorrect email or password. Try the demo credentials below.</div>
+
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="username"/>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+
+    <button class="login-btn" onclick="attemptLogin()">Sign In</button>
+
+    <div class="login-divider"><span>or continue as</span></div>
+    <button class="btn-guest" onclick="loginAsGuest()">Guest / Demo Mode</button>
+
+    <div class="login-hint">
+      <div class="hint-label">Demo Credentials</div>
+      <div>Email: <span>demo@subvampire.in</span></div>
+      <div>Password: <span>slayer123</span></div>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="logo">
     <div class="logo-mark">SVS</div>
@@ -844,8 +955,6 @@ function renderTrials(trials) {
     </div>`;
 }
 
-
-
 function renderTable(subs) {
   document.getElementById('sub-count').textContent = subs.length;
   document.getElementById('sub-table-body').innerHTML = subs.map((s, i) => `
@@ -886,6 +995,42 @@ function showToast(msg, type = 'ok') {
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.remove('show'), 3800);
 }
+
+// ═══════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════
+const USERS = [
+  { email: 'demo@subvampire.in', password: 'slayer123', name: 'Demo User' },
+  { email: 'admin@subvampire.in', password: 'admin123',  name: 'Admin' },
+];
+
+function attemptLogin() {
+  const email    = (document.getElementById('login-email').value || '').trim().toLowerCase();
+  const password = (document.getElementById('login-password').value || '');
+  const errEl    = document.getElementById('login-error');
+  const match    = USERS.find(u => u.email === email && u.password === password);
+  if (match) {
+    errEl.classList.remove('show');
+    doLogin(match.name);
+  } else {
+    errEl.classList.add('show');
+    document.getElementById('login-password').value = '';
+  }
+}
+
+function loginAsGuest() {
+  doLogin('Guest');
+}
+
+function doLogin(name) {
+  const overlay = document.getElementById('login-overlay');
+  overlay.classList.add('hidden');
+  document.getElementById('header-status').textContent = `Welcome, ${name}`;
+  showToast(`Welcome, ${name}! Upload a CSV or load demo data to get started.`, 'ok');
+}
+
+document.getElementById('login-email').addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
 </script>
 </body>
 </html>
