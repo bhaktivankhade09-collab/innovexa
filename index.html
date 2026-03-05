@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SubVampire Slayer — Subscription Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#08090d;--surface:#10121a;--surface2:#181c28;--border:#232840;
+  --accent:#ff3366;--accent2:#7c3aed;--gold:#f59e0b;--green:#10b981;
+  --text:#e8ecf5;--muted:#6b7394;
+  --font-head:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-head);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;opacity:.3;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E")}
+
+/* ── HEADER ── */
+header{position:relative;z-index:10;padding:1.6rem 2.5rem 1.4rem;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(255,51,102,.06) 0%,transparent 100%)}
+.logo{display:flex;align-items:center;gap:.9rem}
+.logo-mark{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;color:#fff;
+  flex-shrink:0;letter-spacing:-.02em;
+}
+.logo-text{font-size:1.35rem;font-weight:700;letter-spacing:-.01em}
+.logo-text span{color:var(--accent)}
+.tagline{font-size:.65rem;color:var(--muted);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-top:.15rem}
+#header-status{font-family:var(--font-mono);font-size:.72rem;color:var(--muted);
+  background:var(--surface2);border:1px solid var(--border);
+  padding:.35rem .85rem;border-radius:20px;white-space:nowrap}
+
+/* ── UPLOAD SECTION ── */
+#upload-section{position:relative;z-index:5;max-width:700px;margin:3.5rem auto 2rem;padding:0 1.5rem}
+
+.upload-card{
+  background:var(--surface);border:2px dashed var(--border);border-radius:20px;
+  padding:2.8rem 2rem;text-align:center;cursor:pointer;transition:all .3s;
+  position:relative;overflow:hidden;
+}
+.upload-card::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,51,102,.06) 0%,transparent 70%);
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.upload-card:hover::after,.upload-card.dragover::after{opacity:1}
+.upload-card:hover,.upload-card.dragover{border-color:var(--accent);transform:scale(1.005)}
+.upload-card.dragover{background:rgba(255,51,102,.03)}
+
+.upload-icon-wrap{
+  width:64px;height:64px;margin:0 auto 1.2rem;
+  background:var(--surface2);border:1px solid var(--border);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.upload-icon-wrap svg{width:28px;height:28px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.upload-title{font-size:1.1rem;font-weight:600;margin-bottom:.4rem}
+.upload-sub{color:var(--muted);font-size:.8rem;font-family:var(--font-mono)}
+#file-input{display:none}
+
+/* ── DEMO ACTIONS ── */
+.demo-actions{
+  display:flex;gap:.8rem;justify-content:center;
+  margin-top:1.6rem;flex-wrap:wrap;
+}
+.btn-download{
+  display:inline-flex;align-items:center;gap:.55rem;
+  background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.4);color:#a78bfa;
+  padding:.6rem 1.5rem;border-radius:8px;font-family:var(--font-mono);
+  font-size:.78rem;cursor:pointer;transition:all .25s;letter-spacing:.03em;font-weight:500;
+}
+.btn-download:hover{background:rgba(124,58,237,.2);border-color:var(--accent2);transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(124,58,237,.2)}
+.btn-download svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+.btn-load-demo{
+  display:inline-flex;align-items:center;gap:.55rem;
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:.6rem 1.5rem;border-radius:8px;font-family:var(--font-mono);
+  font-size:.78rem;cursor:pointer;transition:all .25s;letter-spacing:.03em;
+}
+.btn-load-demo:hover{border-color:var(--muted);color:var(--text);transform:translateY(-2px)}
+.btn-load-demo svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* CSV format hint */
+.format-hint{
+  margin-top:1.2rem;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:.8rem 1.2rem;font-family:var(--font-mono);font-size:.7rem;color:var(--muted);
+}
+.format-hint .fh-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent2);margin-bottom:.4rem}
+.format-hint .fh-row{opacity:.75;line-height:1.9}
+
+/* Income + Analyze */
+.income-row{display:flex;gap:1rem;margin-top:1.6rem;align-items:center;justify-content:center;flex-wrap:wrap}
+.income-row label{font-size:.78rem;color:var(--muted);font-family:var(--font-mono)}
+.income-row input{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  padding:.52rem 1rem;border-radius:8px;font-family:var(--font-mono);font-size:.85rem;width:155px;
+  outline:none;transition:border .2s;
+}
+.income-row input:focus{border-color:var(--accent)}
+
+.analyze-btn{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
+  border:none;padding:.65rem 2.2rem;border-radius:8px;font-family:var(--font-head);
+  font-weight:600;font-size:.9rem;cursor:pointer;letter-spacing:.01em;
+  box-shadow:0 4px 20px rgba(255,51,102,.3);transition:transform .2s,box-shadow .2s,opacity .2s;
+}
+.analyze-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(255,51,102,.45)}
+.analyze-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ── LOADING ── */
+#loading{display:none;text-align:center;padding:5rem 2rem;z-index:5;position:relative}
+.spinner{
+  width:44px;height:44px;border:2.5px solid var(--border);border-top-color:var(--accent);
+  border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 1.3rem;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-msg{font-family:var(--font-mono);color:var(--muted);font-size:.82rem}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none;position:relative;z-index:5;padding:0 2rem 5rem;max-width:1380px;margin:0 auto}
+
+/* Cards */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1.2rem;margin:2rem 0 2.5rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:1.5rem;position:relative;overflow:hidden;transition:transform .25s,border-color .25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.08)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px}
+.card.red::before{background:linear-gradient(90deg,var(--accent),rgba(255,51,102,.3))}
+.card.purple::before{background:linear-gradient(90deg,var(--accent2),rgba(124,58,237,.3))}
+.card.gold::before{background:linear-gradient(90deg,var(--gold),rgba(245,158,11,.3))}
+.card.green::before{background:linear-gradient(90deg,var(--green),rgba(16,185,129,.3))}
+.card-label{font-size:.65rem;font-family:var(--font-mono);color:var(--muted);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem}
+.card-value{font-size:1.85rem;font-weight:700;line-height:1}
+.card-sub{font-size:.7rem;color:var(--muted);margin-top:.45rem;font-family:var(--font-mono)}
+
+/* Gauge */
+.gauge-wrap{display:flex;align-items:center;gap:1rem}
+.gauge-ring{position:relative;width:64px;height:64px;flex-shrink:0}
+.gauge-ring svg{transform:rotate(-90deg)}
+.gauge-ring .track{stroke:var(--border);fill:none;stroke-width:5}
+.gauge-ring .fill{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset 1.3s cubic-bezier(.4,0,.2,1)}
+.gauge-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.78rem;font-weight:700;font-family:var(--font-mono)}
+.gauge-label{font-size:.95rem;font-weight:600}
+.gauge-sub{font-size:.68rem;color:var(--muted);font-family:var(--font-mono);margin-top:.2rem}
+
+/* Section heading */
+.section-head{display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;margin-top:.5rem}
+.section-title{font-size:.95rem;font-weight:600}
+.section-line{flex:1;height:1px;background:var(--border)}
+.badge{background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:5px;padding:.13rem .5rem;font-size:.65rem;font-family:var(--font-mono);color:var(--muted)}
+
+/* Charts */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem;margin-bottom:2.5rem}
+@media(max-width:880px){.charts-grid{grid-template-columns:1fr}}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.4rem}
+.chart-title{font-size:.65rem;font-family:var(--font-mono);color:var(--muted);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.1rem}
+.chart-canvas-wrap{height:200px;position:relative}
+
+/* Table */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;margin-bottom:2.5rem;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:720px}
+thead{background:var(--surface2)}
+th{padding:.85rem 1.1rem;text-align:left;font-size:.64rem;font-family:var(--font-mono);
+  text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:.82rem 1.1rem;font-size:.85rem;border-bottom:1px solid rgba(35,40,64,.4);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.014)}
+tr.reminded td{background:rgba(16,185,129,.025)}
+
+.risk-badge{display:inline-block;padding:.18rem .55rem;border-radius:5px;font-size:.67rem;font-family:var(--font-mono);font-weight:600}
+.risk-High{background:rgba(255,51,102,.12);color:#ff7a9a;border:1px solid rgba(255,51,102,.2)}
+.risk-Medium{background:rgba(245,158,11,.1);color:#fcd34d;border:1px solid rgba(245,158,11,.2)}
+.risk-Low{background:rgba(16,185,129,.1);color:#34d399;border:1px solid rgba(16,185,129,.2)}
+.freq-badge{background:rgba(124,58,237,.12);color:#a78bfa;border:1px solid rgba(124,58,237,.2);
+  display:inline-block;padding:.13rem .5rem;border-radius:5px;font-size:.66rem;font-family:var(--font-mono)}
+.cat-text{color:var(--muted);font-size:.78rem;font-family:var(--font-mono)}
+
+.remind-btn{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:.28rem .9rem;border-radius:6px;cursor:pointer;font-size:.72rem;font-family:var(--font-mono);
+  transition:all .2s;white-space:nowrap;
+}
+.remind-btn:hover{border-color:var(--accent2);color:#a78bfa}
+.remind-btn.active{background:rgba(16,185,129,.08);border-color:var(--green);color:var(--green)}
+
+/* Trials */
+.trials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:2.5rem}
+.trial-card{
+  background:var(--surface);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:1.2rem;
+  display:flex;align-items:flex-start;gap:1rem;
+}
+.trial-icon-box{
+  width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,.1);
+  border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.trial-icon-box svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.trial-merchant{font-weight:700;font-size:.92rem}
+.trial-detail{font-size:.72rem;color:var(--muted);font-family:var(--font-mono);margin-top:.25rem}
+.trial-warn{
+  font-size:.67rem;background:rgba(245,158,11,.08);color:var(--gold);
+  border:1px solid rgba(245,158,11,.18);border-radius:5px;
+  padding:.18rem .55rem;margin-top:.5rem;display:inline-block;font-family:var(--font-mono);
+}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:9999;
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  padding:.85rem 1.5rem;border-radius:10px;font-family:var(--font-mono);font-size:.8rem;
+  transform:translateY(5rem);opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;max-width:380px;line-height:1.4;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.err{border-color:var(--accent);color:var(--accent)}
+.toast.info{border-color:var(--accent2);color:#a78bfa}
+
+/* Animations */
+.fade-up{animation:fadeUp .45s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── PERSONALITY BADGE ── */
+#personality-section{margin-bottom:2.5rem}
+.personality-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:1.4rem 1.8rem;display:flex;align-items:center;gap:1.4rem;
+  position:relative;overflow:hidden;
+}
+.personality-card::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 0% 50%,rgba(124,58,237,.07) 0%,transparent 60%);pointer-events:none}
+.personality-emoji{font-size:2.8rem;line-height:1;flex-shrink:0}
+.personality-info{}
+.personality-title{font-size:.62rem;font-family:var(--font-mono);color:var(--accent2);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem}
+.personality-name{font-size:1.25rem;font-weight:700;margin-bottom:.25rem}
+.personality-desc{font-size:.78rem;color:var(--muted);font-family:var(--font-mono);line-height:1.5}
+.personality-share{
+  margin-left:auto;flex-shrink:0;
+  background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);color:#a78bfa;
+  padding:.5rem 1.1rem;border-radius:8px;font-family:var(--font-mono);font-size:.72rem;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.45rem;
+}
+.personality-share:hover{background:rgba(124,58,237,.2);transform:translateY(-1px)}
+.personality-share svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── CANCELLATION PLANNER ── */
+#cancel-section{margin-bottom:2.5rem}
+.cancel-header-row{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.cancel-savings-pill{
+  background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:var(--green);
+  border-radius:20px;padding:.28rem .9rem;font-family:var(--font-mono);font-size:.72rem;font-weight:600;
+}
+.cancel-list{display:flex;flex-direction:column;gap:.7rem}
+.cancel-item{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:1rem 1.2rem;display:flex;align-items:center;gap:1rem;
+  transition:all .3s;
+}
+.cancel-item.done{opacity:.45;border-color:rgba(16,185,129,.2);background:rgba(16,185,129,.02)}
+.cancel-item.done .cancel-item-name{text-decoration:line-through;color:var(--muted)}
+.cancel-priority{
+  width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;font-family:var(--font-mono);flex-shrink:0;
+}
+.cancel-priority.p1{background:rgba(255,51,102,.15);color:var(--accent);border:1px solid rgba(255,51,102,.3)}
+.cancel-priority.p2{background:rgba(245,158,11,.12);color:var(--gold);border:1px solid rgba(245,158,11,.25)}
+.cancel-priority.p3{background:rgba(107,115,148,.12);color:var(--muted);border:1px solid var(--border)}
+.cancel-item-info{flex:1}
+.cancel-item-name{font-size:.9rem;font-weight:600;margin-bottom:.18rem}
+.cancel-item-meta{font-size:.7rem;color:var(--muted);font-family:var(--font-mono)}
+.cancel-item-amount{font-size:.95rem;font-weight:700;font-family:var(--font-mono);color:var(--accent);margin-right:.5rem;flex-shrink:0}
+.cancel-btn{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:.3rem .9rem;border-radius:7px;font-family:var(--font-mono);font-size:.7rem;
+  cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;
+}
+.cancel-btn:hover{border-color:var(--green);color:var(--green)}
+.cancel-btn.done{border-color:rgba(16,185,129,.3);color:var(--green);cursor:default}
+.cancel-savings-tracker{
+  margin-top:1rem;background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:.9rem 1.2rem;display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--font-mono);font-size:.78rem;color:var(--muted);
+}
+.cancel-savings-tracker .saved-val{font-size:1.1rem;font-weight:700;color:var(--green)}
+
+/* ── PDF EXPORT BUTTON ── */
+.export-btn{
+  display:inline-flex;align-items:center;gap:.55rem;
+  background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:var(--green);
+  padding:.6rem 1.4rem;border-radius:8px;font-family:var(--font-mono);
+  font-size:.78rem;cursor:pointer;transition:all .25s;letter-spacing:.03em;font-weight:500;
+}
+.export-btn:hover{background:rgba(16,185,129,.2);transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,.15)}
+.export-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.export-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ── LOGIN OVERLAY ── */
+#login-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .6s ease,visibility .6s ease;
+}
+#login-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+
+.login-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:2.6rem 2.2rem 2.2rem;width:100%;max-width:400px;
+  position:relative;overflow:hidden;
+  box-shadow:0 0 60px rgba(255,51,102,.08),0 20px 60px rgba(0,0,0,.5);
+}
+.login-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+}
+.login-glow{
+  position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+  width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,51,102,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.login-logo{display:flex;align-items:center;gap:.8rem;margin-bottom:2rem;justify-content:center}
+.login-logo .logo-mark{width:44px;height:44px;border-radius:12px;font-size:.9rem}
+.login-logo .logo-text{font-size:1.4rem}
+.login-heading{font-size:1rem;font-weight:600;margin-bottom:.3rem;text-align:center}
+.login-sub{font-size:.72rem;color:var(--muted);font-family:var(--font-mono);text-align:center;margin-bottom:1.8rem;letter-spacing:.03em}
+
+.login-field{margin-bottom:1rem}
+.login-field label{display:block;font-size:.7rem;font-family:var(--font-mono);color:var(--muted);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:.45rem}
+.login-field input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  padding:.68rem 1rem;border-radius:10px;font-family:var(--font-mono);font-size:.88rem;
+  outline:none;transition:border .2s,box-shadow .2s;
+}
+.login-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,51,102,.1)}
+.login-field input::placeholder{color:var(--muted)}
+
+.login-error{
+  background:rgba(255,51,102,.08);border:1px solid rgba(255,51,102,.25);
+  color:#ff7a9a;border-radius:8px;padding:.6rem 1rem;
+  font-size:.72rem;font-family:var(--font-mono);margin-bottom:1rem;
+  display:none;
+}
+.login-error.show{display:block}
+
+.login-btn{
+  width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;padding:.75rem;border-radius:10px;
+  font-family:var(--font-head);font-weight:600;font-size:.95rem;cursor:pointer;
+  letter-spacing:.01em;box-shadow:0 4px 20px rgba(255,51,102,.3);
+  transition:transform .2s,box-shadow .2s,opacity .2s;margin-top:.2rem;
+}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(255,51,102,.45)}
+.login-btn:active{transform:translateY(0)}
+
+.login-hint{
+  margin-top:1.4rem;padding:1rem;
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  font-family:var(--font-mono);font-size:.68rem;color:var(--muted);line-height:1.9;
+}
+.login-hint .hint-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent2);margin-bottom:.35rem}
+.login-hint span{color:var(--text)}
+
+.login-divider{
+  display:flex;align-items:center;gap:.8rem;margin:1.3rem 0;
+}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.login-divider span{font-size:.62rem;color:var(--muted);font-family:var(--font-mono);white-space:nowrap;letter-spacing:.06em}
+
+.btn-guest{
+  width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:.65rem;border-radius:10px;font-family:var(--font-mono);font-size:.78rem;cursor:pointer;
+  transition:all .2s;letter-spacing:.03em;
+}
+.btn-guest:hover{border-color:var(--muted);color:var(--text)}
+
+@keyframes loginFadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.login-card{animation:loginFadeIn .5s ease both}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN OVERLAY ── -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-glow"></div>
+
+    <div class="login-logo">
+      <div class="logo-mark">SVS</div>
+      <div>
+        <div class="logo-text">Sub<span style="color:var(--accent)">Vampire</span> Slayer</div>
+      </div>
+    </div>
+
+    <div class="login-heading">Welcome back</div>
+    <div class="login-sub">Sign in to your subscription intelligence dashboard</div>
+
+    <div class="login-error" id="login-error">Incorrect email or password. Try the demo credentials below.</div>
+
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="username"/>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+
+    <button class="login-btn" onclick="attemptLogin()">Sign In</button>
+
+    <div class="login-divider"><span>or continue as</span></div>
+    <button class="btn-guest" onclick="loginAsGuest()">Guest / Demo Mode</button>
+
+    <div class="login-hint">
+      <div class="hint-label">Demo Credentials</div>
+      <div>Email: <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="046061696b44777166726569746d76612a6d6a">[email&#160;protected]</a></span></div>
+      <div>Password: <span>slayer123</span></div>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">SVS</div>
+    <div>
+      <div class="logo-text">Sub<span>Vampire</span> Slayer</div>
+      <div class="tagline">Subscription Intelligence System</div>
+    </div>
+  </div>
+  <div id="header-status">Awaiting upload</div>
+  <button class="export-btn" id="export-btn" style="display:none" onclick="exportPDF()">
+    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Download Report
+  </button>
+</header>
+
+<!-- UPLOAD SECTION -->
+<section id="upload-section">
+
+  <!-- Drop zone -->
+  <div class="upload-card" id="drop-zone" onclick="document.getElementById('file-input').click()">
+    <div class="upload-icon-wrap">
+      <!-- Upload cloud icon -->
+      <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+        <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+    </div>
+    <div class="upload-title">Upload your bank statement CSV</div>
+    <div class="upload-sub">Columns required: Date, Merchant, Amount, Type</div>
+    <input type="file" id="file-input" accept=".csv"/>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="demo-actions">
+    <button class="btn-download" onclick="downloadDemoCSV()">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Demo Statement
+    </button>
+    <button class="btn-load-demo" onclick="loadDemoInMemory()">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/>
+        <polyline points="12 8 12 12 14 14"/></svg>
+      Load Demo Instantly
+    </button>
+  </div>
+
+  <!-- CSV format reference -->
+  <div class="format-hint">
+    <div class="fh-label">Expected CSV Format</div>
+    <div class="fh-row">Date,Merchant,Amount,Type</div>
+    <div class="fh-row">2024-01-15,Netflix,199,debit</div>
+    <div class="fh-row">2024-01-15,Spotify,119,debit</div>
+    <div class="fh-row">2024-01-20,Amazon,850,debit</div>
+  </div>
+
+  <!-- Income + Analyze -->
+  <div class="income-row">
+    <label>Monthly Income (Rs.)</label>
+    <input type="number" id="income-input" value="50000" min="1"/>
+    <button class="analyze-btn" id="analyze-btn" disabled onclick="runAnalysis()">Analyze Now</button>
+  </div>
+
+</section>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="load-msg" id="load-msg">Parsing transactions...</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+
+  <!-- Summary Cards -->
+  <div class="cards-grid fade-up" id="summary-cards"></div>
+
+  <!-- Charts -->
+  <div class="section-head fade-up">
+    <span class="section-title">Visual Analytics</span>
+    <div class="section-line"></div>
+  </div>
+  <div class="charts-grid fade-up">
+    <div class="chart-card">
+      <div class="chart-title">Category Breakdown</div>
+      <div class="chart-canvas-wrap"><canvas id="pie-chart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Monthly Amount by Subscription (Rs.)</div>
+      <div class="chart-canvas-wrap"><canvas id="bar-chart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Monthly Spend Trend</div>
+      <div class="chart-canvas-wrap"><canvas id="line-chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Trial Alerts -->
+  <div id="trials-section"></div>
+
+  <!-- Personality Badge -->
+  <div id="personality-section"></div>
+
+  <!-- Smart Cancellation Planner -->
+  <div id="cancel-section"></div>
+
+  <!-- Subscriptions Table -->
+  <div class="section-head fade-up">
+    <span class="section-title">Detected Subscriptions</span>
+    <span class="badge" id="sub-count"></span>
+    <div class="section-line"></div>
+  </div>
+  <div class="table-card fade-up">
+    <table>
+      <thead>
+        <tr>
+          <th>Merchant</th>
+          <th>Rs./Month</th>
+          <th>Frequency</th>
+          <th>Occurrences</th>
+          <th>Last Charge</th>
+          <th>Ghost Risk</th>
+          <th>Category</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="sub-table-body"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ═══════════════════════════════════════════════════
+// DEMO DATA — mirrors generate_demo_csv.py output
+// ═══════════════════════════════════════════════════
+const DEMO_CSV_CONTENT = `Date,Merchant,Amount,Type
+2024-07-15,Netflix,199,debit
+2024-08-15,Netflix,199,debit
+2024-09-15,Netflix,249,debit
+2024-10-15,Netflix,249,debit
+2024-11-15,Netflix,249,debit
+2024-12-15,Netflix,249,debit
+2024-07-12,Spotify,119,debit
+2024-08-12,Spotify,119,debit
+2024-09-12,Spotify,119,debit
+2024-10-12,Spotify,119,debit
+2024-11-12,Spotify,119,debit
+2024-12-12,Spotify,119,debit
+2024-12-10,Canva Pro Trial,1,debit
+2024-08-05,QuickRead Premium,99,debit
+2024-09-05,QuickRead Premium,99,debit
+2024-10-05,QuickRead Premium,99,debit
+2024-11-05,QuickRead Premium,99,debit
+2024-12-05,QuickRead Premium,99,debit
+2024-07-01,FitZone Gym Membership,799,debit
+2024-08-01,FitZone Gym Membership,799,debit
+2024-09-01,FitZone Gym Membership,799,debit
+2024-10-01,FitZone Gym Membership,799,debit
+2024-11-01,FitZone Gym Membership,799,debit
+2024-12-01,FitZone Gym Membership,799,debit
+2024-09-18,Disney+ Hotstar,299,debit
+2024-10-18,Disney+ Hotstar,299,debit
+2024-11-18,Disney+ Hotstar,299,debit
+2024-12-18,Disney+ Hotstar,299,debit
+2024-10-22,Notion Pro,160,debit
+2024-11-22,Notion Pro,160,debit
+2024-12-22,Notion Pro,160,debit
+2024-07-08,Zoom Subscription,149,debit
+2024-08-08,Zoom Subscription,149,debit
+2024-09-08,Zoom Subscription,149,debit
+2024-10-08,Zoom Subscription,149,debit
+2024-11-08,Zoom Subscription,149,debit
+2024-12-08,Zoom Subscription,149,debit
+2024-08-14,Zomato,345,debit
+2024-09-20,Swiggy,220,debit
+2024-10-03,Amazon,1200,debit
+2024-11-25,Flipkart,890,debit
+2024-12-05,Uber,180,debit
+2024-07-22,Ola,95,debit
+2024-08-30,Amazon,430,credit
+2024-10-15,Flipkart,200,credit`;
+
+// ── Download demo CSV as a real file ──
+function downloadDemoCSV() {
+  const blob = new Blob([DEMO_CSV_CONTENT], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'demo_bank_statement.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('demo_bank_statement.csv downloaded — upload it above to test', 'info');
+}
+
+// ── Load demo data into memory without downloading ──
+function loadDemoInMemory() {
+  currentCSVText = DEMO_CSV_CONTENT;
+  document.querySelector('.upload-title').textContent = 'demo_bank_statement.csv';
+  document.querySelector('.upload-sub').textContent   = '8 merchants, 6 months of transactions loaded';
+  document.getElementById('analyze-btn').disabled = false;
+  showToast('Demo data loaded — set your income and click Analyze Now', 'ok');
+}
+
+// ═══════════════════════════════════════════════════
+// CSV PARSER
+// ═══════════════════════════════════════════════════
+function parseCSV(text) {
+  const lines   = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const rows    = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const vals = lines[i].split(',');
+    if (vals.length < headers.length) continue;
+    const row = {};
+    headers.forEach((h, idx) => { row[h] = (vals[idx] || '').trim(); });
+    row.amount = parseFloat(row.amount) || 0;
+    row.date   = new Date(row.date);
+    row.type   = (row.type || '').toLowerCase();
+    if (!isNaN(row.date) && row.amount > 0) rows.push(row);
+  }
+
+  return rows.filter(r => r.type === 'debit');
+}
+
+// ═══════════════════════════════════════════════════
+// ENGINE: SubscriptionPatternEngine
+// ═══════════════════════════════════════════════════
+function detectRecurring(rows) {
+  const groups = {};
+  rows.forEach(r => {
+    const key = `${r.merchant}|||${r.amount}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(r.date);
+  });
+
+  const subs = [];
+  Object.entries(groups).forEach(([key, dates]) => {
+    if (dates.length < 2) return;
+    dates.sort((a, b) => a - b);
+
+    const gaps = [];
+    for (let i = 1; i < dates.length; i++) {
+      gaps.push((dates[i] - dates[i-1]) / 86400000);
+    }
+    const sorted = gaps.slice().sort((a,b) => a - b);
+    const median = sorted[Math.floor(sorted.length / 2)];
+
+    let frequency, monthly_amount;
+    if (median >= 28 && median <= 31) {
+      frequency = 'monthly';
+      monthly_amount = parseFloat(key.split('|||')[1]);
+    } else if (median >= 6 && median <= 8) {
+      frequency = 'weekly';
+      monthly_amount = parseFloat(key.split('|||')[1]) * 4.33;
+    } else return;
+
+    const [merchant] = key.split('|||');
+    const avgGap = gaps.reduce((a,b) => a+b, 0) / gaps.length;
+
+    subs.push({
+      merchant,
+      frequency,
+      monthly_amount: Math.round(monthly_amount * 100) / 100,
+      occurrence_count: dates.length,
+      last_charge_date: dates[dates.length - 1].toISOString().split('T')[0],
+      avg_gap_days: Math.round(avgGap * 10) / 10
+    });
+  });
+
+  return subs;
+}
+
+// ═══════════════════════════════════════════════════
+// ENGINE: GhostRiskEngine
+// ═══════════════════════════════════════════════════
+const ENT_KW  = ['netflix','spotify','hotstar','prime','zee','sony','youtube','crunchyroll','hulu','jio'];
+const PROD_KW = ['notion','zoom','slack','figma','canva','adobe','dropbox','monday','trello','gsuite','microsoft'];
+const FIT_KW  = ['gym','fitness','fitzone','cult','healthify','strava'];
+
+function categorise(merchant) {
+  const m = merchant.toLowerCase();
+  if (ENT_KW.some(k  => m.includes(k))) return 'Entertainment';
+  if (PROD_KW.some(k => m.includes(k))) return 'Productivity';
+  if (FIT_KW.some(k  => m.includes(k))) return 'Fitness';
+  return 'Other';
+}
+
+function scoreGhostRisk(subs) {
+  return subs.map(s => {
+    let score = 0;
+    const cat = categorise(s.merchant);
+    if (s.monthly_amount < 300)    score += 25;
+    if (s.occurrence_count > 4)    score += 20;
+    if (cat === 'Entertainment')   score += 25;
+    if (s.frequency === 'weekly')  score += 15;
+    if (cat === 'Other')           score += 15;
+    score = Math.min(score, 100);
+    const risk_label = score >= 70 ? 'High' : score >= 40 ? 'Medium' : 'Low';
+    return { ...s, category: cat, ghost_risk_score: score, risk_label };
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// ENGINE: TrialPredictionEngine
+// ═══════════════════════════════════════════════════
+const TRIAL_KW = ['trial','premium','pro','membership','plus','elite','vip'];
+
+function predictTrials(rows) {
+  const byMerchant = {};
+  rows.forEach(r => {
+    if (!byMerchant[r.merchant]) byMerchant[r.merchant] = [];
+    byMerchant[r.merchant].push(r);
+  });
+
+  return Object.entries(byMerchant).reduce((acc, [merchant, group]) => {
+    if (group.length !== 1) return acc;
+    const row = group[0];
+    if (row.amount >= 10) return acc;
+    const m = merchant.toLowerCase();
+    if (!TRIAL_KW.some(k => m.includes(k))) return acc;
+
+    const days = m.includes('trial') ? 7 : 30;
+    const next = new Date(row.date);
+    next.setDate(next.getDate() + days);
+
+    acc.push({
+      merchant,
+      trial_amount: row.amount,
+      trial_date: row.date.toISOString().split('T')[0],
+      predicted_renewal_flag: true,
+      estimated_next_charge_date: next.toISOString().split('T')[0],
+      renewal_window_days: days
+    });
+    return acc;
+  }, []);
+}
+
+// ═══════════════════════════════════════════════════
+// ENGINE: SubscriptionAnalyticsEngine
+// ═══════════════════════════════════════════════════
+function computeAnalytics(subs, rows) {
+  const totalMonthly = subs.reduce((s, x) => s + x.monthly_amount, 0);
+
+  const monthMap = {};
+  rows.forEach(r => {
+    const m = r.date.toISOString().slice(0, 7);
+    monthMap[m] = (monthMap[m] || 0) + r.amount;
+  });
+  const monthly_trend = Object.entries(monthMap)
+    .sort(([a],[b]) => a.localeCompare(b))
+    .map(([month, total]) => ({ month, total: Math.round(total) }));
+
+  const catMap = {};
+  subs.forEach(s => { catMap[s.category] = (catMap[s.category] || 0) + s.monthly_amount; });
+  const category_breakdown = Object.entries(catMap)
+    .map(([category, amount]) => ({ category, amount: Math.round(amount * 100) / 100 }));
+
+  return {
+    total_monthly_cost:  Math.round(totalMonthly * 100) / 100,
+    annual_cost:         Math.round(totalMonthly * 12 * 100) / 100,
+    five_year_projection:Math.round(totalMonthly * 12 * 5 * 100) / 100,
+    monthly_trend,
+    category_breakdown,
+    subscription_amounts: subs.map(s => ({ merchant: s.merchant, monthly_amount: s.monthly_amount }))
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// Financial Health Score
+// ═══════════════════════════════════════════════════
+function computeHealth(subs, analytics, income) {
+  if (!income || income <= 0) return { health_score: 50, label: 'Unknown' };
+  const ratio      = Math.min(analytics.total_monthly_cost / income, 1);
+  const incomePen  = Math.round(ratio * 40);
+  const ghostPen   = Math.min(subs.filter(s => s.risk_label === 'High').length * 10, 30);
+  const countPen   = Math.min(subs.length * 3, 30);
+  const score      = Math.max(0, 100 - incomePen - ghostPen - countPen);
+  const label      = score >= 75 ? 'Excellent' : score >= 50 ? 'Fair' : score >= 25 ? 'At Risk' : 'Critical';
+  return { health_score: score, label };
+}
+
+// ═══════════════════════════════════════════════════
+// FILE HANDLING
+// ═══════════════════════════════════════════════════
+let currentCSVText = null;
+const dropZone   = document.getElementById('drop-zone');
+const fileInput  = document.getElementById('file-input');
+const analyzeBtn = document.getElementById('analyze-btn');
+
+fileInput.addEventListener('change', e => { if (e.target.files[0]) readFile(e.target.files[0]); });
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+});
+
+function readFile(f) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    currentCSVText = e.target.result;
+    document.querySelector('.upload-title').textContent = f.name;
+    document.querySelector('.upload-sub').textContent   = `${(f.size / 1024).toFixed(1)} KB — ready to analyze`;
+    analyzeBtn.disabled = false;
+    showToast(`${f.name} loaded successfully`, 'ok');
+  };
+  reader.readAsText(f);
+}
+
+// ═══════════════════════════════════════════════════
+// ANALYSIS ORCHESTRATOR
+// ═══════════════════════════════════════════════════
+function runAnalysis() {
+  if (!currentCSVText) return;
+  analyzeBtn.disabled = true;
+  document.getElementById('loading').style.display  = 'block';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('header-status').textContent = 'Analyzing...';
+
+  const messages = ['Parsing transactions...','Detecting patterns...','Scoring ghost risk...','Building analytics...'];
+  let mi = 0;
+  const iv = setInterval(() => {
+    document.getElementById('load-msg').textContent = messages[++mi % messages.length];
+  }, 500);
+
+  setTimeout(() => {
+    clearInterval(iv);
+    try {
+      const income      = parseFloat(document.getElementById('income-input').value) || 50000;
+      const rows        = parseCSV(currentCSVText);
+      const rawSubs     = detectRecurring(rows);
+      const scoredSubs  = scoreGhostRisk(rawSubs);
+      const trials      = predictTrials(rows);
+      const analytics   = computeAnalytics(scoredSubs, rows);
+      const health      = computeHealth(scoredSubs, analytics, income);
+
+      renderDashboard({
+        subscriptions: scoredSubs, trials, analytics, health,
+        summary: {
+          total_subscriptions: scoredSubs.length,
+          ghost_count: scoredSubs.filter(s => s.risk_label === 'High').length,
+          trial_count: trials.length,
+          monthly_spend: analytics.total_monthly_cost,
+          annual_drain:  analytics.annual_cost
+        }
+      });
+    } catch(err) {
+      showToast('Parse error: ' + err.message, 'err');
+      document.getElementById('loading').style.display = 'none';
+      analyzeBtn.disabled = false;
+    }
+  }, 1600);
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════
+let reminders = new Set();
+
+function renderDashboard(data) {
+  document.getElementById('loading').style.display   = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('header-status').textContent =
+    `${data.summary.total_subscriptions} subscriptions detected`;
+  document.getElementById('export-btn').style.display = 'inline-flex';
+
+  // store globally for export
+  window._lastData = data;
+
+  renderCards(data);
+  renderCharts(data.analytics);
+  renderTrials(data.trials);
+  renderPersonality(data.subscriptions, data.analytics);
+  renderCancelPlanner(data.subscriptions);
+  renderTable(data.subscriptions);
+}
+
+function renderCards(data) {
+  const { health: h, summary: s, analytics: a } = data;
+  const score = h.health_score;
+  const scoreColor =
+    score >= 75 ? '#10b981' : score >= 50 ? '#f59e0b' : score >= 25 ? '#f97316' : '#ff3366';
+  const circ   = 2 * Math.PI * 27;
+  const offset = circ - (score / 100) * circ;
+
+  document.getElementById('summary-cards').innerHTML = [
+    {
+      label: 'Monthly Spend', cls: 'red',
+      value: `Rs.${a.total_monthly_cost?.toLocaleString('en-IN')}`,
+      sub:   `Rs.${a.annual_cost?.toLocaleString('en-IN')} per year`
+    },
+    {
+      label: '5-Year Projection', cls: 'purple',
+      value: `Rs.${a.five_year_projection?.toLocaleString('en-IN')}`,
+      sub:   'If all subscriptions continue'
+    },
+    {
+      label: 'Ghost Subscriptions', cls: 'gold',
+      value: s.ghost_count,
+      sub:   `${s.total_subscriptions} total subscriptions found`
+    },
+    {
+      label: 'Financial Health', cls: 'green',
+      html: `
+        <div class="gauge-wrap">
+          <div class="gauge-ring">
+            <svg viewBox="0 0 66 66" width="64" height="64">
+              <circle class="track" cx="33" cy="33" r="27"/>
+              <circle class="fill" cx="33" cy="33" r="27"
+                stroke="${scoreColor}"
+                stroke-dasharray="${circ.toFixed(2)}"
+                stroke-dashoffset="${offset.toFixed(2)}"/>
+            </svg>
+            <div class="gauge-center" style="color:${scoreColor}">${score}</div>
+          </div>
+          <div>
+            <div class="gauge-label" style="color:${scoreColor}">${h.label}</div>
+            <div class="gauge-sub">${s.trial_count} trial alert${s.trial_count !== 1 ? 's' : ''}</div>
+          </div>
+        </div>`
+    }
+  ].map(c => `
+    <div class="card ${c.cls}">
+      <div class="card-label">${c.label}</div>
+      ${c.html
+        ? c.html
+        : `<div class="card-value">${c.value}</div><div class="card-sub">${c.sub}</div>`}
+    </div>`).join('');
+}
+
+const PALETTE = ['#ff3366','#7c3aed','#f59e0b','#10b981','#3b82f6','#ec4899','#14b8a6','#f97316'];
+
+function destroyChart(id) {
+  const c = Chart.getChart(id);
+  if (c) c.destroy();
+}
+
+function renderCharts(a) {
+  const tick  = { color: '#6b7394', font: { family: 'JetBrains Mono', size: 10 } };
+  const grid  = { color: 'rgba(35,40,64,.7)' };
+  const scales = { x: { ticks: tick, grid }, y: { ticks: tick, grid } };
+
+  destroyChart('pie-chart');
+  new Chart(document.getElementById('pie-chart'), {
+    type: 'doughnut',
+    data: {
+      labels:   a.category_breakdown.map(c => c.category),
+      datasets: [{ data: a.category_breakdown.map(c => c.amount),
+        backgroundColor: PALETTE, borderWidth: 0, hoverOffset: 8 }]
+    },
+    options: {
+      maintainAspectRatio: false, cutout: '60%',
+      plugins: { legend: { labels: { color: '#6b7394', font: { family: 'JetBrains Mono', size: 11 }, boxWidth: 12 } } }
+    }
+  });
+
+  destroyChart('bar-chart');
+  new Chart(document.getElementById('bar-chart'), {
+    type: 'bar',
+    data: {
+      labels:   a.subscription_amounts.map(s => s.merchant),
+      datasets: [{ data: a.subscription_amounts.map(s => s.monthly_amount),
+        backgroundColor: a.subscription_amounts.map((_, i) => PALETTE[i % PALETTE.length]),
+        borderRadius: 5, borderSkipped: false }]
+    },
+    options: { maintainAspectRatio: false, scales, plugins: { legend: { display: false } } }
+  });
+
+  destroyChart('line-chart');
+  new Chart(document.getElementById('line-chart'), {
+    type: 'line',
+    data: {
+      labels:   a.monthly_trend.map(m => m.month),
+      datasets: [{ data: a.monthly_trend.map(m => m.total),
+        borderColor: '#ff3366', backgroundColor: 'rgba(255,51,102,.07)',
+        fill: true, tension: .4, pointRadius: 4,
+        pointBackgroundColor: '#ff3366', pointBorderColor: '#08090d', pointBorderWidth: 2 }]
+    },
+    options: { maintainAspectRatio: false, scales, plugins: { legend: { display: false } } }
+  });
+}
+
+function renderTrials(trials) {
+  const sec = document.getElementById('trials-section');
+  if (!trials.length) { sec.innerHTML = ''; return; }
+
+  sec.innerHTML = `
+    <div class="section-head fade-up">
+      <span class="section-title">Trial Conversion Alerts</span>
+      <span class="badge">${trials.length}</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="trials-grid">${trials.map(t => `
+      <div class="trial-card">
+        <div class="trial-icon-box">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div>
+          <div class="trial-merchant">${t.merchant}</div>
+          <div class="trial-detail">Trial: Rs.${t.trial_amount} charged on ${t.trial_date}</div>
+          <div class="trial-warn">Converts approx. ${t.estimated_next_charge_date}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+}
+
+function renderTable(subs) {
+  document.getElementById('sub-count').textContent = subs.length;
+  document.getElementById('sub-table-body').innerHTML = subs.map((s, i) => `
+    <tr id="row-${i}" class="${reminders.has(i) ? 'reminded' : ''}">
+      <td><strong>${s.merchant}</strong></td>
+      <td style="font-family:var(--font-mono)">Rs.${s.monthly_amount.toLocaleString('en-IN')}</td>
+      <td><span class="freq-badge">${s.frequency}</span></td>
+      <td style="font-family:var(--font-mono);color:var(--muted);text-align:center">${s.occurrence_count}x</td>
+      <td style="font-family:var(--font-mono);color:var(--muted)">${s.last_charge_date}</td>
+      <td><span class="risk-badge risk-${s.risk_label}">${s.risk_label} (${s.ghost_risk_score})</span></td>
+      <td class="cat-text">${s.category}</td>
+      <td>
+        <button class="remind-btn ${reminders.has(i) ? 'active' : ''}"
+          id="btn-${i}"
+          onclick="toggleReminder(${i}, '${s.merchant}', '${s.last_charge_date}')">
+          ${reminders.has(i) ? 'Reminder Set' : 'Remind Me'}
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+function toggleReminder(idx, merchant, lastDate) {
+  if (reminders.has(idx)) return;
+  reminders.add(idx);
+  const btn = document.getElementById(`btn-${idx}`);
+  btn.className = 'remind-btn active';
+  btn.textContent = 'Reminder Set';
+  document.getElementById(`row-${idx}`).classList.add('reminded');
+  const next = new Date(lastDate);
+  next.setDate(next.getDate() + 30);
+  showToast(`Reminder set for ${merchant} — next charge around ${next.toDateString()}`, 'ok');
+}
+
+// ═══════════════════════════════════════════════════
+// SPENDING PERSONALITY BADGE
+// ═══════════════════════════════════════════════════
+const PERSONALITIES = [
+  { key:'Entertainment', emoji:'🎬', name:'Serial Streamer',      desc:'Your wallet is basically a multiplex. You love entertainment content above all.' },
+  { key:'Productivity',  emoji:'💼', name:'Productivity Hoarder', desc:'Every app promises 10x output. You subscribed to all of them — just in case.' },
+  { key:'Fitness',       emoji:'🏋️', name:'Aspiring Athlete',     desc:'The gym membership is there. The guilt is real. But hey, you\'re paying for the dream.' },
+  { key:'Other',         emoji:'🌀', name:'Digital Nomad',        desc:'A diverse, unpredictable mix of subscriptions. You live life on your own terms.' },
+];
+
+function renderPersonality(subs, analytics) {
+  const sec = document.getElementById('personality-section');
+  if (!subs.length) { sec.innerHTML = ''; return; }
+
+  // find dominant category
+  const catTotals = {};
+  subs.forEach(s => { catTotals[s.category] = (catTotals[s.category] || 0) + s.monthly_amount; });
+  const dominant = Object.entries(catTotals).sort((a,b) => b[1]-a[1])[0][0];
+  const p = PERSONALITIES.find(x => x.key === dominant) || PERSONALITIES[3];
+
+  sec.innerHTML = `
+    <div class="section-head fade-up">
+      <span class="section-title">Spending Personality</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="personality-card fade-up">
+      <div class="personality-emoji">${p.emoji}</div>
+      <div class="personality-info">
+        <div class="personality-title">Your Subscriber Profile</div>
+        <div class="personality-name">${p.name}</div>
+        <div class="personality-desc">${p.desc}</div>
+      </div>
+      <button class="personality-share" onclick="sharePersonality('${p.emoji} ${p.name}')">
+        <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share Badge
+      </button>
+    </div>`;
+}
+
+function sharePersonality(badge) {
+  const text = `My spending personality on SubVampire Slayer: ${badge} 🧛 #SubVampireSlayer`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showToast('Badge text copied to clipboard!', 'ok'));
+  } else {
+    showToast('Badge: ' + text, 'info');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SMART CANCELLATION PLANNER
+// ═══════════════════════════════════════════════════
+let cancelledSet = new Set();
+
+function renderCancelPlanner(subs) {
+  const sec = document.getElementById('cancel-section');
+  if (!subs.length) { sec.innerHTML = ''; return; }
+
+  // Sort by ghost risk score desc, take top candidates
+  const ranked = subs
+    .filter(s => s.risk_label === 'High' || s.risk_label === 'Medium')
+    .sort((a,b) => b.ghost_risk_score - a.ghost_risk_score)
+    .slice(0, 5);
+
+  if (!ranked.length) { sec.innerHTML = ''; return; }
+
+  const potentialSavings = ranked.reduce((t,s) => t + s.monthly_amount, 0);
+
+  sec.innerHTML = `
+    <div class="section-head fade-up">
+      <span class="section-title">Smart Cancellation Planner</span>
+      <span class="badge">${ranked.length} suggested</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="cancel-list fade-up" id="cancel-list">
+      ${ranked.map((s, i) => {
+        const pClass = i === 0 ? 'p1' : i <= 2 ? 'p2' : 'p3';
+        const isDone = cancelledSet.has(s.merchant);
+        return `
+        <div class="cancel-item ${isDone?'done':''}" id="ci-${i}">
+          <div class="cancel-priority ${pClass}">${i+1}</div>
+          <div class="cancel-item-info">
+            <div class="cancel-item-name">${s.merchant}</div>
+            <div class="cancel-item-meta">${s.category} · Ghost Risk: ${s.risk_label} (${s.ghost_risk_score}) · Last charged ${s.last_charge_date}</div>
+          </div>
+          <span class="cancel-item-amount">Rs.${s.monthly_amount.toLocaleString('en-IN')}/mo</span>
+          <button class="cancel-btn ${isDone?'done':''}" id="cbtn-${i}"
+            onclick="markCancelled(${i}, '${s.merchant}', ${s.monthly_amount})" ${isDone?'disabled':''}>
+            ${isDone ? '✓ Cancelled' : 'Mark Cancelled'}
+          </button>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="cancel-savings-tracker">
+      <span>Potential savings if all cancelled:</span>
+      <span class="saved-val" id="cancel-potential">Rs.${Math.round(potentialSavings).toLocaleString('en-IN')}/mo</span>
+      <span style="margin-left:2rem">Already saved:</span>
+      <span class="saved-val" id="cancel-saved">Rs.0/mo</span>
+    </div>`;
+
+  window._cancelRanked = ranked;
+}
+
+function markCancelled(idx, merchant, amount) {
+  if (cancelledSet.has(merchant)) return;
+  cancelledSet.add(merchant);
+
+  const item = document.getElementById(`ci-${idx}`);
+  const btn  = document.getElementById(`cbtn-${idx}`);
+  item.classList.add('done');
+  btn.classList.add('done');
+  btn.textContent = '✓ Cancelled';
+  btn.disabled = true;
+
+  // update saved total
+  const totalSaved = (window._cancelRanked || [])
+    .filter(s => cancelledSet.has(s.merchant))
+    .reduce((t,s) => t + s.monthly_amount, 0);
+  document.getElementById('cancel-saved').textContent = `Rs.${Math.round(totalSaved).toLocaleString('en-IN')}/mo`;
+
+  showToast(`${merchant} marked as cancelled — saving Rs.${Math.round(amount).toLocaleString('en-IN')}/mo 🎉`, 'ok');
+}
+
+// ═══════════════════════════════════════════════════
+// PDF REPORT EXPORT
+// ═══════════════════════════════════════════════════
+function exportPDF() {
+  const data = window._lastData;
+  if (!data) return;
+  const { analytics: a, summary: s, health: h, subscriptions: subs } = data;
+
+  const date = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+  const rows = subs.map(sub => `
+    <tr>
+      <td>${sub.merchant}</td>
+      <td>Rs.${sub.monthly_amount.toLocaleString('en-IN')}</td>
+      <td>${sub.frequency}</td>
+      <td>${sub.category}</td>
+      <td><span class="risk-${sub.risk_label}">${sub.risk_label}</span></td>
+    </tr>`).join('');
+
+  const topCancel = (subs)
+    .filter(x => x.risk_label === 'High' || x.risk_label === 'Medium')
+    .sort((a,b) => b.ghost_risk_score - a.ghost_risk_score)
+    .slice(0,3)
+    .map((x,i) => `<li><strong>${x.merchant}</strong> — Rs.${x.monthly_amount.toLocaleString('en-IN')}/mo (${x.risk_label} risk)</li>`)
+    .join('');
+
+  const catTotals = {};
+  subs.forEach(sub => { catTotals[sub.category] = (catTotals[sub.category] || 0) + sub.monthly_amount; });
+  const dominant = Object.entries(catTotals).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'Other';
+  const pMap = {Entertainment:'🎬 Serial Streamer', Productivity:'💼 Productivity Hoarder', Fitness:'🏋️ Aspiring Athlete', Other:'🌀 Digital Nomad'};
+  const badge = pMap[dominant] || pMap.Other;
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/>
+<title>SubVampire Slayer — Report</title>
+<style>
+  body{font-family:'Segoe UI',sans-serif;color:#1a1a2e;margin:0;padding:0;background:#fff}
+  .cover{background:linear-gradient(135deg,#08090d,#10121a);color:#fff;padding:48px 40px;position:relative}
+  .cover h1{font-size:2rem;margin:0 0 6px;letter-spacing:-.02em}
+  .cover h1 span{color:#ff3366}
+  .cover .sub{color:#6b7394;font-size:.85rem;font-family:monospace;margin-bottom:28px}
+  .cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+  .cstat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 18px}
+  .cstat .label{font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:#6b7394;margin-bottom:4px}
+  .cstat .val{font-size:1.5rem;font-weight:700}
+  .cstat .val.red{color:#ff3366}.cstat .val.green{color:#10b981}.cstat .val.gold{color:#f59e0b}.cstat .val.purple{color:#a78bfa}
+  .section{padding:30px 40px;border-bottom:1px solid #eee}
+  .section h2{font-size:1rem;font-weight:700;margin:0 0 16px;text-transform:uppercase;letter-spacing:.06em;color:#333}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  th{text-align:left;padding:8px 10px;background:#f5f5f8;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:#666;border-bottom:2px solid #eee}
+  td{padding:9px 10px;border-bottom:1px solid #f0f0f0}
+  .risk-High{color:#ff3366;font-weight:600}.risk-Medium{color:#f59e0b;font-weight:600}.risk-Low{color:#10b981;font-weight:600}
+  .badge-box{background:#f5f5f8;border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px}
+  .badge-emoji{font-size:2.2rem}.badge-name{font-size:1.1rem;font-weight:700}
+  .badge-desc{font-size:.78rem;color:#666;margin-top:4px}
+  .cancel-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+  .cancel-list li{background:#fff8f8;border:1px solid #ffe0e6;border-radius:8px;padding:10px 14px;font-size:.83rem}
+  .footer{text-align:center;padding:24px;font-size:.72rem;color:#aaa;font-family:monospace}
+</style></head><body>
+<div class="cover">
+  <h1>Sub<span>Vampire</span> Slayer</h1>
+  <div class="sub">SUBSCRIPTION INTELLIGENCE REPORT · ${date}</div>
+  <div class="cover-grid">
+    <div class="cstat"><div class="label">Monthly Spend</div><div class="val red">Rs.${a.total_monthly_cost?.toLocaleString('en-IN')}</div></div>
+    <div class="cstat"><div class="label">Annual Drain</div><div class="val purple">Rs.${a.annual_cost?.toLocaleString('en-IN')}</div></div>
+    <div class="cstat"><div class="label">Ghost Subscriptions</div><div class="val gold">${s.ghost_count}</div></div>
+    <div class="cstat"><div class="label">Health Score</div><div class="val green">${h.health_score} — ${h.label}</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Spending Personality</h2>
+  <div class="badge-box">
+    <div class="badge-emoji">${badge.split(' ')[0]}</div>
+    <div><div class="badge-name">${badge.split(' ').slice(1).join(' ')}</div>
+    <div class="badge-desc">Dominant category: ${dominant} · Rs.${Math.round(catTotals[dominant]||0).toLocaleString('en-IN')}/mo</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Top Cancellation Recommendations</h2>
+  <ul class="cancel-list">${topCancel || '<li>No high-risk subscriptions detected.</li>'}</ul>
+</div>
+
+<div class="section">
+  <h2>All Detected Subscriptions (${subs.length})</h2>
+  <table>
+    <thead><tr><th>Merchant</th><th>Rs./Month</th><th>Frequency</th><th>Category</th><th>Risk</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+</div>
+
+<div class="footer">Generated by SubVampire Slayer · ${date} · subvampire.in</div>
+</body></html>`;
+
+  const blob = new Blob([html], {type:'text/html'});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if (win) {
+    win.onload = () => { win.print(); };
+  }
+  showToast('Report opened — use browser Print → Save as PDF', 'info');
+}
+
+function showToast(msg, type = 'ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3800);
+}
+
+// ═══════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════
+const USERS = [
+  { email: 'demo@subvampire.in', password: 'slayer123', name: 'Demo User' },
+  { email: 'admin@subvampire.in', password: 'admin123',  name: 'Admin' },
+];
+
+function attemptLogin() {
+  const email    = (document.getElementById('login-email').value || '').trim().toLowerCase();
+  const password = (document.getElementById('login-password').value || '');
+  const errEl    = document.getElementById('login-error');
+  const match    = USERS.find(u => u.email === email && u.password === password);
+  if (match) {
+    errEl.classList.remove('show');
+    doLogin(match.name);
+  } else {
+    errEl.classList.add('show');
+    document.getElementById('login-password').value = '';
+  }
+}
+
+function loginAsGuest() {
+  doLogin('Guest');
+}
+
+function doLogin(name) {
+  const overlay = document.getElementById('login-overlay');
+  overlay.classList.add('hidden');
+  document.getElementById('header-status').textContent = `Welcome, ${name}`;
+  showToast(`Welcome, ${name}! Upload a CSV or load demo data to get started.`, 'ok');
+}
+
+document.getElementById('login-email').addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
+</script>
+</body>
+</html>
