@@ -15,5 +15,7 @@ python3 -m http.server 3000
 2. Upload it and click "Analyze Now"
 3. Or click "Load Demo Instantly" to skip the upload step
 
-repository : https://github.com/bhaktivankhade09-collab/innovexa.git
- Link : https://bhaktivankhade09-collab.github.io/innovexa/
+Repository : https://github.com/bhaktivankhade09-collab/innovexa.git
+ Website Link : https://bhaktivankhade09-collab.github.io/innovexa/
+email : demo@subvampire.in
+password : slayer123
